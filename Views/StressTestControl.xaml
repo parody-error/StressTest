@@ -33,6 +33,13 @@
         </Grid>
         <Grid Grid.Row="2">
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <TextBox
+                    Name="MemoryInMB"
+                    Width="200"
+                    Height="20"
+                    IsReadOnly="False"
+                    PreviewTextInput="NumberValidationTextBox"
+                    Text="{Binding MemoryInMB, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Button
                     Width="80"
                     Height="20"

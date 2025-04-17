@@ -3,7 +3,6 @@
 #include <vector>
 #include <cstring>
 
-//#SB: if this works, just use new/delete probably
 extern "C" __declspec( dllexport ) int RunMemoryStress( int megabytesToAllocate )
 {
     try {
@@ -21,7 +20,7 @@ extern "C" __declspec( dllexport ) int RunMemoryStress( int megabytesToAllocate 
         }
 
         // Simulate some delay
-        Sleep( 2000 ); //#SB: reduce this, just testing
+        Sleep( 2000 );
 
         for ( char* chunk : allocations ) {
             free( chunk );
