@@ -1,27 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StressTest.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace StressTest.Views
 {
-    /// <summary>
-    /// Interaction logic for ConnectionDialog.xaml
-    /// </summary>
     public partial class ConnectionDialog : Window
     {
+        public string SourceDSN { get; private set; } = string.Empty;
+
         public ConnectionDialog()
         {
             InitializeComponent();
+
+            var connectionVM = new ConnectionViewModel();
+            DataContext = connectionVM;
+
+            connectionVM.OnConnectEvent += OnConnect;
+            connectionVM.OnCancelEvent += OnCancel;
+        }
+
+        public void Dispose()
+        {
+            var connectionVM = DataContext as ConnectionViewModel;
+            if ( connectionVM != null )
+            {
+                connectionVM.OnConnectEvent -= OnConnect;
+                connectionVM.OnCancelEvent -= OnCancel;
+            }
+        }
+
+        private void OnConnect( string sourceDSN )
+        {
+            SourceDSN = sourceDSN;
+            DialogResult = !string.IsNullOrEmpty( sourceDSN );
+        }
+
+        private void OnCancel()
+        {
+            DialogResult = false;
         }
     }
 }

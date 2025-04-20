@@ -1,4 +1,5 @@
 ﻿using StressTest.ViewModels;
+using StressTest.Views;
 using System.Windows;
 
 namespace StressTest
@@ -12,7 +13,17 @@ namespace StressTest
             var mainVM = new MainViewModel();
             DataContext = mainVM;
 
-            //#SB: add connection dialog behaviour.
+            var connectionPrompt = new ConnectionDialog();
+            var result = connectionPrompt.ShowDialog() ?? false;
+
+            if ( result )
+            {
+                mainVM.StressTestViewModel.SourceDSN = connectionPrompt.SourceDSN;
+            }
+            else
+            {
+                Close();
+            }
         }
     }
 }

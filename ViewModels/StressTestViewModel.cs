@@ -7,6 +7,8 @@ namespace StressTest.ViewModels
 {
     internal class StressTestViewModel : ViewModelBase
     {
+        public string SourceDSN { get; set; }
+
         private string _query = "SELECT * FROM WELL"; //#SB: use a different query
         public string Query
         {
