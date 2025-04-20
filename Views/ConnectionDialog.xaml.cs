@@ -36,10 +36,7 @@ namespace StressTest.Views
             Username = username;
             Password = password;
 
-            DialogResult =
-                !string.IsNullOrEmpty( SourceDSN ) &&
-                !string.IsNullOrEmpty( Username ) &&
-                !string.IsNullOrEmpty( Password );
+            DialogResult = !string.IsNullOrEmpty( SourceDSN );
         }
 
         private void OnCancel()

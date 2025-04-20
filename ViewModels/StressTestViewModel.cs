@@ -23,27 +23,8 @@ namespace StressTest.ViewModels
             }
         }
 
-        private string _username = string.Empty;
-        public string Username
-        {
-            get => _username;
-            set
-            {
-                _username = value;
-                QueryCommand.RaiseCanExecuteChanged();
-            }
-        }
-
-        private string _password = string.Empty;
-        public string Password
-        {
-            get => _password;
-            set
-            {
-                _password = value;
-                QueryCommand.RaiseCanExecuteChanged();
-            }
-        }
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
 
         private string _query = "SELECT * FROM WELL"; //#SB: use a different query
         public string Query
@@ -82,11 +63,7 @@ namespace StressTest.ViewModels
         private bool CanExecuteAllocateCommand => !string.IsNullOrEmpty( _memoryInMB );
 
         public DelegateCommand QueryCommand { get; }
-        private bool CanExecuteQueryCommand =>
-            !string.IsNullOrEmpty( Query ) &&
-            !string.IsNullOrEmpty( SourceDSN ) &&
-            !string.IsNullOrEmpty( Username ) &&
-            !string.IsNullOrEmpty( Password );
+        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty( Query ) && !string.IsNullOrEmpty( SourceDSN );
 
         public StressTestViewModel()
         {

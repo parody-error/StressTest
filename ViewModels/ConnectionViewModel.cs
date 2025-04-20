@@ -24,37 +24,14 @@ namespace StressTest.ViewModels
             }
         }
 
-        private string _username = "ss_auth"; //#SB: string.Empty;
-        public string Username
-        {
-            get => _username;
-            set
-            {
-                _username = value;
-                UpdateCommandState();
-            }
-        }
-
-        private string _password = "ss_pass"; //#SB: string.Empty;
-        public string Password
-        {
-            get => _password;
-            set
-            {
-                _password = value;
-                UpdateCommandState();
-            }
-        }
+        public string Username { get; set; } = "ss_auth"; //#SB: string.Empty;
+        public string Password { get; set; } = "ss_pass"; //#SB: string.Empty;
 
         public ConnectionViewModel()
         {
             SelectCommand = new DelegateCommand(
                 ExecuteSelectCommand,
-                () => {
-                    return !string.IsNullOrEmpty( _sourceDSN ) &&
-                           !string.IsNullOrEmpty( _username ) &&
-                           !string.IsNullOrEmpty( _password );
-                }
+                () => { return !string.IsNullOrEmpty( _sourceDSN ); }
             );
 
             CancelCommand = new DelegateCommand(
@@ -65,7 +42,7 @@ namespace StressTest.ViewModels
 
         private void ExecuteSelectCommand()
         {
-            OnSelectEvent?.Invoke( _sourceDSN, _username, _password );
+            OnSelectEvent?.Invoke( _sourceDSN, Username, Password );
         }
 
         private void ExecuteCancelCommand()
