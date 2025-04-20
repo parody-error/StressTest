@@ -14,7 +14,7 @@ namespace StressTest.Views
             var connectionVM = new ConnectionViewModel();
             DataContext = connectionVM;
 
-            connectionVM.OnConnectEvent += OnConnect;
+            connectionVM.OnSelectEvent += OnSelect;
             connectionVM.OnCancelEvent += OnCancel;
         }
 
@@ -23,12 +23,12 @@ namespace StressTest.Views
             var connectionVM = DataContext as ConnectionViewModel;
             if ( connectionVM != null )
             {
-                connectionVM.OnConnectEvent -= OnConnect;
+                connectionVM.OnSelectEvent -= OnSelect;
                 connectionVM.OnCancelEvent -= OnCancel;
             }
         }
 
-        private void OnConnect( string sourceDSN )
+        private void OnSelect( string sourceDSN )
         {
             SourceDSN = sourceDSN;
             DialogResult = !string.IsNullOrEmpty( sourceDSN );

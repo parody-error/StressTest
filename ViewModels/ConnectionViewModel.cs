@@ -4,13 +4,13 @@ namespace StressTest.ViewModels
 {
     internal class ConnectionViewModel : ViewModelBase
     {
-        public delegate void OnConnectAction( string sourceDSN );
-        public event OnConnectAction OnConnectEvent;
+        public delegate void OnSelectAction( string sourceDSN );
+        public event OnSelectAction OnSelectEvent;
 
         public delegate void OnCancelAction();
         public event OnCancelAction OnCancelEvent;
 
-        public DelegateCommand ConnectCommand { get; }
+        public DelegateCommand SelectCommand { get; }
         public DelegateCommand CancelCommand { get; }
 
         private string _sourceDSN = string.Empty;
@@ -26,8 +26,8 @@ namespace StressTest.ViewModels
 
         public ConnectionViewModel()
         {
-            ConnectCommand = new DelegateCommand(
-                ExecuteConnectCommand,
+            SelectCommand = new DelegateCommand(
+                ExecuteSelectCommand,
                 () => { return !string.IsNullOrEmpty( _sourceDSN ); }
             );
 
@@ -37,9 +37,9 @@ namespace StressTest.ViewModels
             );
         }
 
-        private void ExecuteConnectCommand()
+        private void ExecuteSelectCommand()
         {
-            OnConnectEvent?.Invoke( _sourceDSN );
+            OnSelectEvent?.Invoke( _sourceDSN );
         }
 
         private void ExecuteCancelCommand()
@@ -49,7 +49,7 @@ namespace StressTest.ViewModels
 
         private void UpdateCommandState()
         {
-            ConnectCommand.RaiseCanExecuteChanged();
+            SelectCommand.RaiseCanExecuteChanged();
         }
     }
 }
