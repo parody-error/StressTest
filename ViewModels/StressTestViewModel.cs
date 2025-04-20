@@ -38,7 +38,34 @@ namespace StressTest.ViewModels
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
-        private string _query = "SELECT * FROM WELL"; //#SB: use a different query
+        private string _query =
+@"select
+  PROPNUM,
+  LEASE,
+  STATE,
+  COUNTY,
+  FIELD,
+  RESERVOIR,
+  PROPNUM,
+  API_14,
+  LEASE,
+  OPERATOR,
+  OPERATED_FLAG,
+  ASSET,
+  ENERTIA_ID,
+  BUDGET_YEAR,
+  RESERVOIR_CATEGORY,
+  ARIES_SOURCE
+from
+  ANALYTICS.DIM_AC_PROPERTY
+where
+  PROPNUM is not NULL and 
+  ( RESERVOIR in ('BOSSIER', 'HAYNESVILLE SHALE', 'MID BOSSIER', 'UPR BOSSIER') ) and 
+  ( OPERATED_FLAG in ('Y') ) and 
+  ( BUDGET_YEAR in ('CURRENT') ) and 
+  ( RESERVOIR_CATEGORY in ('1PDP', '2PDNP', '3PUD', '4PROB', '4PUDX', '5POSS', '6CON') )
+";
+
         public string Query
         {
             get => _query;
@@ -95,13 +122,12 @@ namespace StressTest.ViewModels
             if ( !CanExecuteAllocateCommand )
                 return;
 
+            int memoryInMB = int.Parse( _memoryInMB );
+
             try
             {
-                int memoryInMB = int.Parse( _memoryInMB );
-
                 await Application.Current.Dispatcher.BeginInvoke( new Action( () => { StatusMessage = $"Allocating {memoryInMB} MB of memory"; } ) );
                 await Task.Run( () => { NativeMethods.RunMemoryStress( memoryInMB ); } );
-
             }
             catch ( Exception ex )
             {
@@ -109,7 +135,7 @@ namespace StressTest.ViewModels
             }
             finally
             {
-                Application.Current.Dispatcher.Invoke( () => { StatusMessage = string.Empty; } );
+                Application.Current.Dispatcher.Invoke( () => { StatusMessage = $"Deallocated {memoryInMB} MB of memory"; } );
             }
         }
 

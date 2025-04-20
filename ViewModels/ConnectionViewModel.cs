@@ -13,7 +13,7 @@ namespace StressTest.ViewModels
         public DelegateCommand SelectCommand { get; }
         public DelegateCommand CancelCommand { get; }
 
-        private string _sourceDSN = "StressTestDSN_ss"; //#sb:  string.Empty;
+        private string _sourceDSN = string.Empty;
         public string SourceDSN
         {
             get => _sourceDSN;
@@ -24,7 +24,7 @@ namespace StressTest.ViewModels
             }
         }
 
-        private string _database = "StressTest"; //#sb: string.Empty;
+        private string _database = string.Empty;
         public string Database
         {
             get => _database;
@@ -35,8 +35,8 @@ namespace StressTest.ViewModels
             }
         }
 
-        public string Username { get; set; } = "ss_auth"; //#SB: string.Empty;
-        public string Password { get; set; } = "ss_pass"; //#SB: string.Empty;
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
 
         public ConnectionViewModel()
         {
