@@ -8,6 +8,8 @@ public static class NativeMethods
     [DllImport( "QueryStressTest.dll", CallingConvention = CallingConvention.Cdecl )]
     public static extern int RunQueryStress(
         [MarshalAs(UnmanagedType.LPStr )] string dsn,
+        [MarshalAs( UnmanagedType.LPStr )] string user,
+        [MarshalAs( UnmanagedType.LPStr )] string password,
         [MarshalAs( UnmanagedType.LPStr )] string query
     );
 }

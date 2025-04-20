@@ -3,7 +3,8 @@
 #include <sql.h>
 #include <sqlext.h>
 
-extern "C" __declspec( dllexport ) int RunQueryStress( const char* dsn, const char* query )
+extern "C" __declspec( dllexport )
+int __cdecl RunQueryStress( const char* dsn, const char* user, const char* password, const char* query )
 {
     SQLHENV hEnv;
     SQLHDBC hDbc;
@@ -14,9 +15,16 @@ extern "C" __declspec( dllexport ) int RunQueryStress( const char* dsn, const ch
     SQLSetEnvAttr( hEnv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0 );
     SQLAllocHandle( SQL_HANDLE_DBC, hEnv, &hDbc );
 
-    ret = SQLConnectA( hDbc, (SQLCHAR*)dsn, SQL_NTS, NULL, 0, NULL, 0 );
-    if ( ret != SQL_SUCCESS && ret != SQL_SUCCESS_WITH_INFO )
+    ret = SQLConnectA( hDbc,
+        (SQLCHAR*)dsn, SQL_NTS,
+        (SQLCHAR*)user, SQL_NTS,
+        (SQLCHAR*)password, SQL_NTS );
+
+    if ( ret != SQL_SUCCESS && ret != SQL_SUCCESS_WITH_INFO ) {
+        SQLFreeHandle( SQL_HANDLE_DBC, hDbc );
+        SQLFreeHandle( SQL_HANDLE_ENV, hEnv );
         return -1;
+    }
 
     SQLAllocHandle( SQL_HANDLE_STMT, hDbc, &hStmt );
     ret = SQLExecDirectA( hStmt, (SQLCHAR*)query, SQL_NTS );

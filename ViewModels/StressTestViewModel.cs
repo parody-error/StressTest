@@ -7,7 +7,10 @@ namespace StressTest.ViewModels
 {
     internal class StressTestViewModel : ViewModelBase
     {
-        private const int UNKNOWN_RESULT = -1;
+        private const int UNKNOWN_RESULT = -3;
+        private const int SUCCESS_RESULT = 0;
+        private const int AUTH_ERROR = -1;
+        private const int QUERY_ERROR = -2;
 
         private string _sourceDSN = string.Empty;
         public string SourceDSN
@@ -128,7 +131,7 @@ namespace StressTest.ViewModels
 
                 await Task.Run( () =>
                 {
-                    result = NativeMethods.RunQueryStress( SourceDSN, Query );
+                    result = NativeMethods.RunQueryStress( SourceDSN, "ss_auth", "ss_pass", Query );
 
                     // Clear StatusMessage after the operation completes
                     Application.Current.Dispatcher.Invoke( () =>
@@ -145,8 +148,24 @@ namespace StressTest.ViewModels
             {
                 Application.Current.Dispatcher.Invoke( () =>
                 {
-                    //#SB: refactor
-                    StatusMessage = result == 0 ? "Success" : "Failed";
+                    switch (result)
+                    {
+                        case SUCCESS_RESULT:
+                            StatusMessage = "Success";
+                            break;
+                        case AUTH_ERROR:
+                            StatusMessage = "Authentication error";
+                            break;
+                        case QUERY_ERROR:
+                            StatusMessage = "Query error";
+                            break;
+                        case UNKNOWN_RESULT:
+                            StatusMessage = "Unknown error";
+                            break;
+                        default:
+                            StatusMessage = "Unknown error";
+                            break;
+                    }
                 } );
             }
         }
