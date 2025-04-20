@@ -24,9 +24,19 @@ namespace StressTest.ViewModels
             }
         }
 
+        private string _database = string.Empty;
+        public string Database
+        {
+            get => _database;
+            set
+            {
+                _database = value;
+                QueryCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string Database { get; set;} = string.Empty;
 
         private string _query = "SELECT * FROM WELL"; //#SB: use a different query
         public string Query
