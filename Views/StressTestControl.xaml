@@ -25,42 +25,49 @@
                 <Button
                     Width="80"
                     Height="20"
-                    Margin="8"
+                    Margin="8, 4, 4, 4"
                     Command="{Binding QueryCommand}">
                     Execute
                 </Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <TextBlock
-                    Name="StatusMessage"
-                    Width="300"
-                    Height="20"
-                    Margin="2,2,8,2"
-                    Text="{Binding StatusMessage, Mode=OneWay}"
-                    TextAlignment="Right" />
-                <TextBox
-                    Name="MemoryInMB"
-                    Width="75"
-                    Height="20"
-                    IsReadOnly="False"
-                    PreviewTextInput="NumberValidationTextBox"
-                    Text="{Binding MemoryInMB, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox
-                    Name="Unit"
-                    Width="40"
-                    Height="20"
-                    IsReadOnly="True"
-                    Text="(MB)" />
-                <Button
-                    Width="80"
-                    Height="20"
-                    Margin="8"
-                    Command="{Binding AllocateCommand}">
-                    Allocate
-                </Button>
-            </StackPanel>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Name="StatusMessage"
+                Grid.Column="0"
+                Height="20"
+                Margin="4"
+                Text="{Binding StatusMessage, Mode=OneWay}"
+                TextAlignment="Left" />
+            <TextBox
+                Name="MemoryInMB"
+                Grid.Column="1"
+                Width="75"
+                Height="20"
+                IsReadOnly="False"
+                PreviewTextInput="NumberValidationTextBox"
+                Text="{Binding MemoryInMB, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Name="Unit"
+                Grid.Column="2"
+                Width="40"
+                Height="20"
+                IsReadOnly="True"
+                Text="(MB)" />
+            <Button
+                Grid.Column="3"
+                Width="80"
+                Height="20"
+                Margin="8, 4, 4, 4"
+                Command="{Binding AllocateCommand}">
+                Allocate
+            </Button>
         </Grid>
 
     </Grid>

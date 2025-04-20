@@ -124,19 +124,17 @@ namespace StressTest.ViewModels
                     switch ( result )
                     {
                         case SUCCESS_RESULT:
-                            StatusMessage = "Success";
+                            StatusMessage = "Executed query successfully";
                             break;
                         case AUTH_ERROR:
                             StatusMessage = "Authentication error";
                             break;
                         case QUERY_ERROR:
-                            StatusMessage = "Query error";
+                            StatusMessage = "Error executing query";
                             break;
                         case UNKNOWN_RESULT:
-                            StatusMessage = "Unknown error";
-                            break;
                         default:
-                            StatusMessage = "Unknown error";
+                            StatusMessage = "Unknown error encountered";
                             break;
                     }
                 } );
