@@ -1,5 +1,6 @@
 ﻿using Prism.Commands;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace StressTest.ViewModels
@@ -25,6 +26,17 @@ namespace StressTest.ViewModels
             {
                 _memoryInMB = value;
                 AllocateCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private string _statusMessage = string.Empty;
+        public string StatusMessage
+        {
+            get => _statusMessage;
+            set
+            {
+                _statusMessage = value;
+                OnPropertyChanged( nameof(StatusMessage) );
             }
         }
 
@@ -55,13 +67,34 @@ namespace StressTest.ViewModels
             try
             {
                 int memoryInMB = int.Parse( _memoryInMB );
-                NativeMethods.RunMemoryStress( memoryInMB, 10 );
-                //#SB: maybe add something to the UI to show that the memory is being allocated.
-                MessageBox.Show( "Done" );
+
+                Application.Current.Dispatcher.BeginInvoke( new Action( () =>
+                {
+                    StatusMessage = $"Allocating {memoryInMB} MB of memory";
+                } ) );
+
+                Task.Run( () =>
+                {
+                    NativeMethods.RunMemoryStress( memoryInMB, 10 );
+
+                    // Clear StatusMessage after the operation completes
+                    Application.Current.Dispatcher.Invoke( () =>
+                    {
+                        StatusMessage = string.Empty;
+                    } );
+                } );
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+            }
+            finally
+            {
+                Application.Current.Dispatcher.Invoke( () =>
+                {
+                    StatusMessage = string.Empty;
+                } );
             }
         }
 
