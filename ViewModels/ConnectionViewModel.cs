@@ -13,7 +13,7 @@ namespace StressTest.ViewModels
         public DelegateCommand SelectCommand { get; }
         public DelegateCommand CancelCommand { get; }
 
-        private string _sourceDSN = string.Empty;
+        private string _sourceDSN = "StressTestDSN"; //#sb:  string.Empty;
         public string SourceDSN
         {
             get => _sourceDSN;

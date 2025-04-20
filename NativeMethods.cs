@@ -3,5 +3,11 @@
 public static class NativeMethods
 {
     [DllImport( "MemoryStressTest.dll", CallingConvention = CallingConvention.Cdecl )]
-    public static extern void RunMemoryStress( int megabytesToAllocate, int holdSeconds );
+    public static extern void RunMemoryStress( int megabytesToAllocate );
+
+    [DllImport( "QueryStressTest.dll", CallingConvention = CallingConvention.Cdecl )]
+    public static extern int RunQueryStress(
+        [MarshalAs(UnmanagedType.LPStr )] string dsn,
+        [MarshalAs( UnmanagedType.LPStr )] string query
+    );
 }

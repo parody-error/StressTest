@@ -7,7 +7,18 @@ namespace StressTest.ViewModels
 {
     internal class StressTestViewModel : ViewModelBase
     {
-        public string SourceDSN { get; set; }
+        private const int UNKNOWN_RESULT = -1;
+
+        private string _sourceDSN = string.Empty;
+        public string SourceDSN
+        {
+            get => _sourceDSN;
+            set
+            {
+                _sourceDSN = value;
+                QueryCommand.RaiseCanExecuteChanged();
+            }
+        }
 
         private string _query = "SELECT * FROM WELL"; //#SB: use a different query
         public string Query
@@ -46,7 +57,7 @@ namespace StressTest.ViewModels
         private bool CanExecuteAllocateCommand => !string.IsNullOrEmpty( _memoryInMB );
 
         public DelegateCommand QueryCommand { get; }
-        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty( Query );
+        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty( Query ) && !string.IsNullOrEmpty( SourceDSN );
 
         public StressTestViewModel()
         {
@@ -77,7 +88,7 @@ namespace StressTest.ViewModels
 
                 Task.Run( () =>
                 {
-                    NativeMethods.RunMemoryStress( memoryInMB, 10 );
+                    NativeMethods.RunMemoryStress( memoryInMB );
 
                     // Clear StatusMessage after the operation completes
                     Application.Current.Dispatcher.Invoke( () =>
@@ -100,12 +111,44 @@ namespace StressTest.ViewModels
             }
         }
 
-        private void ExecuteQueryCommand()
+        private async void ExecuteQueryCommand()
         {
             if ( !CanExecuteQueryCommand )
                 return;
 
-            Console.WriteLine( "Querying" );
+            int result = UNKNOWN_RESULT;
+
+            try
+            {
+                //#SB: if we keep status-messages, update this
+                await Application.Current.Dispatcher.BeginInvoke( new Action( () =>
+                {
+                    StatusMessage = $"Executing query...";
+                } ) );
+
+                await Task.Run( () =>
+                {
+                    result = NativeMethods.RunQueryStress( SourceDSN, Query );
+
+                    // Clear StatusMessage after the operation completes
+                    Application.Current.Dispatcher.Invoke( () =>
+                    {
+                        StatusMessage = string.Empty;
+                    } );
+                } );
+            }
+            catch ( Exception ex )
+            {
+                MessageBox.Show( $"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+            }
+            finally
+            {
+                Application.Current.Dispatcher.Invoke( () =>
+                {
+                    //#SB: refactor
+                    StatusMessage = result == 0 ? "Success" : "Failed";
+                } );
+            }
         }
     }
 }
