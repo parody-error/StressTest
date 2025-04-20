@@ -7,10 +7,11 @@ namespace StressTest.ViewModels
 {
     internal class StressTestViewModel : ViewModelBase
     {
-        private const int UNKNOWN_RESULT = -3;
+        private const int UNKNOWN_RESULT = -9;
         private const int SUCCESS_RESULT = 0;
         private const int AUTH_ERROR = -1;
-        private const int QUERY_ERROR = -2;
+        private const int USE_DATABASE_ERROR = -2;
+        private const int QUERY_ERROR = -3;
 
         private string _sourceDSN = string.Empty;
         public string SourceDSN
@@ -25,6 +26,7 @@ namespace StressTest.ViewModels
 
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string Database { get; set;} = string.Empty;
 
         private string _query = "SELECT * FROM WELL"; //#SB: use a different query
         public string Query
@@ -63,7 +65,7 @@ namespace StressTest.ViewModels
         private bool CanExecuteAllocateCommand => !string.IsNullOrEmpty( _memoryInMB );
 
         public DelegateCommand QueryCommand { get; }
-        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty( Query ) && !string.IsNullOrEmpty( SourceDSN );
+        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty( Query ) && !string.IsNullOrEmpty( SourceDSN ) && !string.IsNullOrEmpty( Database );
 
         public StressTestViewModel()
         {
@@ -111,7 +113,7 @@ namespace StressTest.ViewModels
             try
             {
                 await Application.Current.Dispatcher.BeginInvoke( new Action( () => { StatusMessage = "Executing query..."; } ) );
-                await Task.Run( () => { result = NativeMethods.RunQueryStress( SourceDSN, Username, Password, Query ); } );
+                await Task.Run( () => { result = NativeMethods.RunQueryStress( SourceDSN, Username, Password, Database, Query ); } );
             }
             catch ( Exception ex )
             {
@@ -128,6 +130,9 @@ namespace StressTest.ViewModels
                             break;
                         case AUTH_ERROR:
                             StatusMessage = "Authentication error";
+                            break;
+                        case USE_DATABASE_ERROR:
+                            StatusMessage = "Error using database";
                             break;
                         case QUERY_ERROR:
                             StatusMessage = "Error executing query";

@@ -4,7 +4,7 @@ namespace StressTest.ViewModels
 {
     internal class ConnectionViewModel : ViewModelBase
     {
-        public delegate void OnSelectAction( string sourceDSN, string username, string password );
+        public delegate void OnSelectAction( string sourceDSN, string username, string password, string database );
         public event OnSelectAction OnSelectEvent;
 
         public delegate void OnCancelAction();
@@ -24,6 +24,17 @@ namespace StressTest.ViewModels
             }
         }
 
+        private string _database = "StressTest"; //#sb: string.Empty;
+        public string Database
+        {
+            get => _database;
+            set
+            {
+                _database = value;
+                UpdateCommandState();
+            }
+        }
+
         public string Username { get; set; } = "ss_auth"; //#SB: string.Empty;
         public string Password { get; set; } = "ss_pass"; //#SB: string.Empty;
 
@@ -31,7 +42,7 @@ namespace StressTest.ViewModels
         {
             SelectCommand = new DelegateCommand(
                 ExecuteSelectCommand,
-                () => { return !string.IsNullOrEmpty( _sourceDSN ); }
+                () => { return !string.IsNullOrEmpty( _sourceDSN ) && !string.IsNullOrEmpty( _database ); }
             );
 
             CancelCommand = new DelegateCommand(
@@ -42,7 +53,7 @@ namespace StressTest.ViewModels
 
         private void ExecuteSelectCommand()
         {
-            OnSelectEvent?.Invoke( _sourceDSN, Username, Password );
+            OnSelectEvent?.Invoke( SourceDSN, Username, Password, Database );
         }
 
         private void ExecuteCancelCommand()

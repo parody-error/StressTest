@@ -10,6 +10,7 @@ public static class NativeMethods
         [MarshalAs(UnmanagedType.LPStr )] string dsn,
         [MarshalAs( UnmanagedType.LPStr )] string user,
         [MarshalAs( UnmanagedType.LPStr )] string password,
+        [MarshalAs( UnmanagedType.LPStr )] string database,
         [MarshalAs( UnmanagedType.LPStr )] string query
     );
 }
