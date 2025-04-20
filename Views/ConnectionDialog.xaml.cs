@@ -6,6 +6,8 @@ namespace StressTest.Views
     public partial class ConnectionDialog : Window
     {
         public string SourceDSN { get; private set; } = string.Empty;
+        public string Username { get; private set; } = string.Empty;
+        public string Password { get; private set; } = string.Empty;
 
         public ConnectionDialog()
         {
@@ -28,10 +30,16 @@ namespace StressTest.Views
             }
         }
 
-        private void OnSelect( string sourceDSN )
+        private void OnSelect( string sourceDSN, string username, string password )
         {
             SourceDSN = sourceDSN;
-            DialogResult = !string.IsNullOrEmpty( sourceDSN );
+            Username = username;
+            Password = password;
+
+            DialogResult =
+                !string.IsNullOrEmpty( SourceDSN ) &&
+                !string.IsNullOrEmpty( Username ) &&
+                !string.IsNullOrEmpty( Password );
         }
 
         private void OnCancel()

@@ -19,6 +19,8 @@ namespace StressTest
             if ( result )
             {
                 mainVM.StressTestViewModel.SourceDSN = connectionPrompt.SourceDSN;
+                mainVM.StressTestViewModel.Username = connectionPrompt.Username;
+                mainVM.StressTestViewModel.Password = connectionPrompt.Password;
             }
             else
             {

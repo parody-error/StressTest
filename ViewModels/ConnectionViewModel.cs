@@ -4,7 +4,7 @@ namespace StressTest.ViewModels
 {
     internal class ConnectionViewModel : ViewModelBase
     {
-        public delegate void OnSelectAction( string sourceDSN );
+        public delegate void OnSelectAction( string sourceDSN, string username, string password );
         public event OnSelectAction OnSelectEvent;
 
         public delegate void OnCancelAction();
@@ -13,7 +13,7 @@ namespace StressTest.ViewModels
         public DelegateCommand SelectCommand { get; }
         public DelegateCommand CancelCommand { get; }
 
-        private string _sourceDSN = "StressTestDSN"; //#sb:  string.Empty;
+        private string _sourceDSN = "StressTestDSN_ss"; //#sb:  string.Empty;
         public string SourceDSN
         {
             get => _sourceDSN;
@@ -24,11 +24,37 @@ namespace StressTest.ViewModels
             }
         }
 
+        private string _username = "ss_auth"; //#SB: string.Empty;
+        public string Username
+        {
+            get => _username;
+            set
+            {
+                _username = value;
+                UpdateCommandState();
+            }
+        }
+
+        private string _password = "ss_pass"; //#SB: string.Empty;
+        public string Password
+        {
+            get => _password;
+            set
+            {
+                _password = value;
+                UpdateCommandState();
+            }
+        }
+
         public ConnectionViewModel()
         {
             SelectCommand = new DelegateCommand(
                 ExecuteSelectCommand,
-                () => { return !string.IsNullOrEmpty( _sourceDSN ); }
+                () => {
+                    return !string.IsNullOrEmpty( _sourceDSN ) &&
+                           !string.IsNullOrEmpty( _username ) &&
+                           !string.IsNullOrEmpty( _password );
+                }
             );
 
             CancelCommand = new DelegateCommand(
@@ -39,7 +65,7 @@ namespace StressTest.ViewModels
 
         private void ExecuteSelectCommand()
         {
-            OnSelectEvent?.Invoke( _sourceDSN );
+            OnSelectEvent?.Invoke( _sourceDSN, _username, _password );
         }
 
         private void ExecuteCancelCommand()

@@ -23,6 +23,28 @@ namespace StressTest.ViewModels
             }
         }
 
+        private string _username = string.Empty;
+        public string Username
+        {
+            get => _username;
+            set
+            {
+                _username = value;
+                QueryCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private string _password = string.Empty;
+        public string Password
+        {
+            get => _password;
+            set
+            {
+                _password = value;
+                QueryCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         private string _query = "SELECT * FROM WELL"; //#SB: use a different query
         public string Query
         {
@@ -52,7 +74,7 @@ namespace StressTest.ViewModels
             set
             {
                 _statusMessage = value;
-                OnPropertyChanged( nameof(StatusMessage) );
+                OnPropertyChanged( nameof( StatusMessage ) );
             }
         }
 
@@ -60,7 +82,11 @@ namespace StressTest.ViewModels
         private bool CanExecuteAllocateCommand => !string.IsNullOrEmpty( _memoryInMB );
 
         public DelegateCommand QueryCommand { get; }
-        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty( Query ) && !string.IsNullOrEmpty( SourceDSN );
+        private bool CanExecuteQueryCommand =>
+            !string.IsNullOrEmpty( Query ) &&
+            !string.IsNullOrEmpty( SourceDSN ) &&
+            !string.IsNullOrEmpty( Username ) &&
+            !string.IsNullOrEmpty( Password );
 
         public StressTestViewModel()
         {
@@ -75,7 +101,7 @@ namespace StressTest.ViewModels
             );
         }
 
-        private void ExecuteAllocateCommand()
+        private async void ExecuteAllocateCommand()
         {
             if ( !CanExecuteAllocateCommand )
                 return;
@@ -84,33 +110,17 @@ namespace StressTest.ViewModels
             {
                 int memoryInMB = int.Parse( _memoryInMB );
 
-                Application.Current.Dispatcher.BeginInvoke( new Action( () =>
-                {
-                    StatusMessage = $"Allocating {memoryInMB} MB of memory";
-                } ) );
-
-                Task.Run( () =>
-                {
-                    NativeMethods.RunMemoryStress( memoryInMB );
-
-                    // Clear StatusMessage after the operation completes
-                    Application.Current.Dispatcher.Invoke( () =>
-                    {
-                        StatusMessage = string.Empty;
-                    } );
-                } );
+                await Application.Current.Dispatcher.BeginInvoke( new Action( () => { StatusMessage = $"Allocating {memoryInMB} MB of memory"; } ) );
+                await Task.Run( () => { NativeMethods.RunMemoryStress( memoryInMB ); } );
 
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+                MessageBox.Show( $"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
             }
             finally
             {
-                Application.Current.Dispatcher.Invoke( () =>
-                {
-                    StatusMessage = string.Empty;
-                } );
+                Application.Current.Dispatcher.Invoke( () => { StatusMessage = string.Empty; } );
             }
         }
 
@@ -123,22 +133,8 @@ namespace StressTest.ViewModels
 
             try
             {
-                //#SB: if we keep status-messages, update this
-                await Application.Current.Dispatcher.BeginInvoke( new Action( () =>
-                {
-                    StatusMessage = $"Executing query...";
-                } ) );
-
-                await Task.Run( () =>
-                {
-                    result = NativeMethods.RunQueryStress( SourceDSN, "ss_auth", "ss_pass", Query );
-
-                    // Clear StatusMessage after the operation completes
-                    Application.Current.Dispatcher.Invoke( () =>
-                    {
-                        StatusMessage = string.Empty;
-                    } );
-                } );
+                await Application.Current.Dispatcher.BeginInvoke( new Action( () => { StatusMessage = "Executing query..."; } ) );
+                await Task.Run( () => { result = NativeMethods.RunQueryStress( SourceDSN, Username, Password, Query ); } );
             }
             catch ( Exception ex )
             {
@@ -148,7 +144,7 @@ namespace StressTest.ViewModels
             {
                 Application.Current.Dispatcher.Invoke( () =>
                 {
-                    switch (result)
+                    switch ( result )
                     {
                         case SUCCESS_RESULT:
                             StatusMessage = "Success";
