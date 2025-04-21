@@ -12,6 +12,7 @@ namespace StressTest.ViewModels
         private const int AUTH_ERROR = -1;
         private const int USE_DATABASE_ERROR = -2;
         private const int QUERY_ERROR = -3;
+        private const int ODBC_ERROR = -4;
 
         private string _sourceDSN = string.Empty;
         public string SourceDSN
@@ -172,6 +173,9 @@ where
                             break;
                         case QUERY_ERROR:
                             StatusMessage = "Error executing query";
+                            break;
+                        case ODBC_ERROR:
+                            StatusMessage = "ODBC error";
                             break;
                         case UNKNOWN_RESULT:
                         default:

@@ -7,6 +7,7 @@
 #include <tchar.h>
 
 #pragma comment(lib, "Dbghelp.lib")
+#pragma comment(lib, "odbc32.lib")
 
 LONG WINAPI MyUnhandledExceptionFilter( EXCEPTION_POINTERS* pExceptionInfo )
 {
@@ -63,6 +64,7 @@ int __cdecl RunQueryStress( const char* dsn, const char* user, const char* passw
 
     // Switch to specified database
     std::string useDbCmd = "USE " + std::string( database );
+
     ret = SQLExecDirectA( hStmt, (SQLCHAR*)useDbCmd.c_str(), SQL_NTS );
     if ( ret != SQL_SUCCESS && ret != SQL_SUCCESS_WITH_INFO ) {
         SQLFreeHandle( SQL_HANDLE_STMT, hStmt );
@@ -74,6 +76,16 @@ int __cdecl RunQueryStress( const char* dsn, const char* user, const char* passw
 
     // Execute the main query
     ret = SQLExecDirectA( hStmt, (SQLCHAR*)query, SQL_NTS );
+	if ( ret != SQL_SUCCESS && ret != SQL_SUCCESS_WITH_INFO ) {
+		SQLFreeHandle( SQL_HANDLE_STMT, hStmt );
+		SQLDisconnect( hDbc );
+		SQLFreeHandle( SQL_HANDLE_DBC, hDbc );
+		SQLFreeHandle( SQL_HANDLE_ENV, hEnv );
+		return -3;
+	}
+
+    while ( SQLFetch( hStmt ) != SQL_NO_DATA ) {
+    }
 
     SQLFreeHandle( SQL_HANDLE_STMT, hStmt );
     SQLDisconnect( hDbc );
