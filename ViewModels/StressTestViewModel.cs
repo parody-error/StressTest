@@ -13,6 +13,9 @@ namespace StressTest.ViewModels
         private const int USE_DATABASE_ERROR = -2;
         private const int QUERY_ERROR = -3;
         private const int ODBC_ERROR = -4;
+        private const int DESCRIBE_ERROR = -5;
+        private const int NO_TABLES_ERROR = -6;
+        private const int EXCEPTION_DESCRIBING_TABLES = -7;
 
         private string _sourceDSN = string.Empty;
         public string SourceDSN
@@ -36,6 +39,7 @@ namespace StressTest.ViewModels
             }
         }
 
+        public string Schema { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
@@ -95,26 +99,35 @@ where
             set
             {
                 _statusMessage = value;
-                OnPropertyChanged( nameof( StatusMessage ) );
+                OnPropertyChanged(nameof(StatusMessage));
             }
         }
 
         public DelegateCommand AllocateCommand { get; }
-        private bool CanExecuteAllocateCommand => !string.IsNullOrEmpty( _memoryInMB );
+        private bool CanExecuteAllocateCommand => !string.IsNullOrEmpty(_memoryInMB);
 
         public DelegateCommand QueryCommand { get; }
-        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty( Query ) && !string.IsNullOrEmpty( SourceDSN ) && !string.IsNullOrEmpty( Database );
+        private bool CanExecuteQueryCommand => !string.IsNullOrEmpty(Query) && !string.IsNullOrEmpty(SourceDSN) && !string.IsNullOrEmpty(Database);
+
+        public DelegateCommand DescribeCommand { get; }
+        private bool CanExectueDescribeCommand => true;
+
 
         public StressTestViewModel()
         {
-            AllocateCommand = new DelegateCommand(
-                ExecuteAllocateCommand,
-                () => CanExecuteAllocateCommand
-            );
-
             QueryCommand = new DelegateCommand(
                 ExecuteQueryCommand,
                 () => CanExecuteQueryCommand
+            );
+
+            DescribeCommand = new DelegateCommand(
+                ExecuteDescribeCommand,
+                () => CanExectueDescribeCommand
+            );
+
+            AllocateCommand = new DelegateCommand(
+                ExecuteAllocateCommand,
+                () => CanExecuteAllocateCommand
             );
         }
 
@@ -123,20 +136,20 @@ where
             if ( !CanExecuteAllocateCommand )
                 return;
 
-            int memoryInMB = int.Parse( _memoryInMB );
+            int memoryInMB = int.Parse(_memoryInMB);
 
             try
             {
-                await Application.Current.Dispatcher.BeginInvoke( new Action( () => { StatusMessage = $"Allocating {memoryInMB} MB of memory"; } ) );
-                await Task.Run( () => { NativeMethods.RunMemoryStress( memoryInMB ); } );
+                await Application.Current.Dispatcher.BeginInvoke(new Action(() => { StatusMessage = $"Allocating {memoryInMB} MB of memory"; }));
+                await Task.Run(() => { NativeMethods.RunMemoryStress(memoryInMB); });
             }
             catch ( Exception ex )
             {
-                MessageBox.Show( $"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
-                Application.Current.Dispatcher.Invoke( () => { StatusMessage = $"Deallocated {memoryInMB} MB of memory"; } );
+                Application.Current.Dispatcher.Invoke(() => { StatusMessage = $"Deallocated {memoryInMB} MB of memory"; });
             }
         }
 
@@ -149,16 +162,16 @@ where
 
             try
             {
-                await Application.Current.Dispatcher.BeginInvoke( new Action( () => { StatusMessage = "Executing query..."; } ) );
-                await Task.Run( () => { result = NativeMethods.RunQueryStress( SourceDSN, Username, Password, Database, Query ); } );
+                await Application.Current.Dispatcher.BeginInvoke(new Action(() => { StatusMessage = "Executing query..."; }));
+                await Task.Run(() => { result = NativeMethods.RunQueryStress(SourceDSN, Username, Password, Database, Query); });
             }
             catch ( Exception ex )
             {
-                MessageBox.Show( $"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
-                Application.Current.Dispatcher.Invoke( () =>
+                Application.Current.Dispatcher.Invoke(() =>
                 {
                     switch ( result )
                     {
@@ -182,7 +195,62 @@ where
                             StatusMessage = "Unknown error encountered";
                             break;
                     }
-                } );
+                });
+            }
+        }
+
+        private async void ExecuteDescribeCommand()
+        {
+            if ( !CanExectueDescribeCommand )
+                return;
+
+            int result = UNKNOWN_RESULT;
+
+            try
+            {
+                await Application.Current.Dispatcher.BeginInvoke(new Action(() => { StatusMessage = "Describing database..."; }));
+                await Task.Run(() => { result = NativeMethods.RunQueryStress(SourceDSN, Username, Password, Database, Query); });
+            }
+            catch ( Exception ex )
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    switch ( result )
+                    {
+                        case SUCCESS_RESULT:
+                            StatusMessage = "Described tables successfully";
+                            break;
+                        case AUTH_ERROR:
+                            StatusMessage = "Authentication error";
+                            break;
+                        case USE_DATABASE_ERROR:
+                            StatusMessage = "Error using database";
+                            break;
+                        case QUERY_ERROR:
+                            StatusMessage = "Error executing query";
+                            break;
+                        case DESCRIBE_ERROR:
+                            StatusMessage = "Error describing tables";
+                            break;
+                        case NO_TABLES_ERROR:
+                            StatusMessage = "No tables found";
+                            break;
+                        case EXCEPTION_DESCRIBING_TABLES:
+                            StatusMessage = "Exception while describing tables";
+                            break;
+                        case ODBC_ERROR:
+                            StatusMessage = "ODBC error";
+                            break;
+                        case UNKNOWN_RESULT:
+                        default:
+                            StatusMessage = "Unknown error encountered";
+                            break;
+                    }
+                });
             }
         }
     }

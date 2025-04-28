@@ -15,6 +15,8 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBox
             Grid.Row="0"
@@ -32,9 +34,19 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button
+                    Width="80"
+                    Height="20"
+                    Margin="8,4,4,4"
+                    Command="{Binding DescribeCommand}">
+                    Describe
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
@@ -69,6 +81,5 @@
                 Allocate
             </Button>
         </Grid>
-
     </Grid>
 </UserControl>

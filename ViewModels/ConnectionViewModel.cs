@@ -1,10 +1,11 @@
-﻿using Prism.Commands;
+﻿using System.Web;
+using Prism.Commands;
 
 namespace StressTest.ViewModels
 {
     internal class ConnectionViewModel : ViewModelBase
     {
-        public delegate void OnSelectAction( string sourceDSN, string username, string password, string database );
+        public delegate void OnSelectAction( string sourceDSN, string username, string password, string database, string schema );
         public event OnSelectAction OnSelectEvent;
 
         public delegate void OnCancelAction();
@@ -35,6 +36,17 @@ namespace StressTest.ViewModels
             }
         }
 
+        private string _schema = string.Empty;
+        public string Schema
+        {
+            get => _schema;
+            set
+            {
+                _schema = value;
+                UpdateCommandState();
+            }
+        }
+
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
@@ -42,7 +54,12 @@ namespace StressTest.ViewModels
         {
             SelectCommand = new DelegateCommand(
                 ExecuteSelectCommand,
-                () => { return !string.IsNullOrEmpty( _sourceDSN ) && !string.IsNullOrEmpty( _database ); }
+                () => {
+                    return
+                    !string.IsNullOrEmpty(_sourceDSN) &&
+                    !string.IsNullOrEmpty(_database) &&
+                    !string.IsNullOrEmpty(_schema);
+                }
             );
 
             CancelCommand = new DelegateCommand(
@@ -53,7 +70,7 @@ namespace StressTest.ViewModels
 
         private void ExecuteSelectCommand()
         {
-            OnSelectEvent?.Invoke( SourceDSN, Username, Password, Database );
+            OnSelectEvent?.Invoke( SourceDSN, Username, Password, Database, Schema );
         }
 
         private void ExecuteCancelCommand()

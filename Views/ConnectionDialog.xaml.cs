@@ -9,6 +9,7 @@ namespace StressTest.Views
         public string Username { get; private set; } = string.Empty;
         public string Password { get; private set; } = string.Empty;
         public string Database { get; private set; } = string.Empty;
+        public string Schema { get; private set; } = string.Empty;
 
         public ConnectionDialog()
         {
@@ -31,14 +32,18 @@ namespace StressTest.Views
             }
         }
 
-        private void OnSelect( string sourceDSN, string username, string password, string database )
+        private void OnSelect( string sourceDSN, string username, string password, string database, string schema )
         {
             SourceDSN = sourceDSN;
             Username = username;
             Password = password;
             Database = database;
+            Schema = schema;
 
-            DialogResult = !string.IsNullOrEmpty( SourceDSN ) && !string.IsNullOrEmpty( Database );
+            DialogResult = 
+                !string.IsNullOrEmpty( SourceDSN ) &&
+                !string.IsNullOrEmpty( Database ) &&
+                !string.IsNullOrEmpty( Schema );
         }
 
         private void OnCancel()
