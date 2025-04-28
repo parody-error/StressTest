@@ -22,6 +22,7 @@ namespace StressTest
                 mainVM.StressTestViewModel.Username = connectionPrompt.Username;
                 mainVM.StressTestViewModel.Password = connectionPrompt.Password;
                 mainVM.StressTestViewModel.Database = connectionPrompt.Database;
+                mainVM.StressTestViewModel.Schema = connectionPrompt.Schema;
             }
             else
             {
