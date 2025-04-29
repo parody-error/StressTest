@@ -209,7 +209,7 @@ where
             try
             {
                 await Application.Current.Dispatcher.BeginInvoke(new Action(() => { StatusMessage = "Describing database..."; }));
-                await Task.Run(() => { result = NativeMethods.RunQueryStress(SourceDSN, Username, Password, Database, Query); });
+                await Task.Run(() => { result = NativeMethods.RunDescribe(SourceDSN, Username, Password, Database, Schema); });
             }
             catch ( Exception ex )
             {

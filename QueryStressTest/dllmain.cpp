@@ -183,12 +183,25 @@ int __cdecl RunDescribe( const char* dsn, const char* user, const char* password
 
             pst->Release();
         }
+        else
+        {
+            delete pst;
+            SQLFreeHandle( SQL_HANDLE_STMT, hStmt );
+            SQLDisconnect( hDbc );
+            SQLFreeHandle( SQL_HANDLE_DBC, hDbc );
+            SQLFreeHandle( SQL_HANDLE_ENV, hEnv );
 
-        
+			return DESCRIBE_ERROR;
+        }
     }
     catch( ... )
     {
         delete pst;
+        SQLFreeHandle( SQL_HANDLE_STMT, hStmt );
+        SQLDisconnect( hDbc );
+        SQLFreeHandle( SQL_HANDLE_DBC, hDbc );
+        SQLFreeHandle( SQL_HANDLE_ENV, hEnv );
+
         return EXCEPTION_DESCRIBING_TABLES;
     }
     
