@@ -112,6 +112,8 @@ where
         public DelegateCommand DescribeCommand { get; }
         private bool CanExectueDescribeCommand => true;
 
+        public DelegateCommand ThreadedDescribeCommand { get; }
+        private bool CanExecuteThreadedDescribeCommand => true;
 
         public StressTestViewModel()
         {
@@ -123,6 +125,11 @@ where
             DescribeCommand = new DelegateCommand(
                 ExecuteDescribeCommand,
                 () => CanExectueDescribeCommand
+            );
+
+            ThreadedDescribeCommand = new DelegateCommand(
+                ExecuteThreadedDescribeCommand,
+                () => CanExecuteThreadedDescribeCommand
             );
 
             AllocateCommand = new DelegateCommand(
@@ -251,6 +258,61 @@ where
                             break;
                     }
                 });
+            }
+        }
+
+        private async void ExecuteThreadedDescribeCommand()
+        {
+            if ( !CanExectueDescribeCommand )
+                return;
+
+            int result = UNKNOWN_RESULT;
+
+            try
+            {
+                await Application.Current.Dispatcher.BeginInvoke( new Action( () => { StatusMessage = "Describing database..."; } ) );
+                await Task.Run( () => { result = NativeMethods.RunThreadedDescribe( SourceDSN, Username, Password, Database, Schema ); } );
+            }
+            catch ( Exception ex )
+            {
+                MessageBox.Show( $"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+            }
+            finally
+            {
+                Application.Current.Dispatcher.Invoke( () =>
+                {
+                    switch ( result )
+                    {
+                        case SUCCESS_RESULT:
+                            StatusMessage = "Described tables successfully";
+                            break;
+                        case AUTH_ERROR:
+                            StatusMessage = "Authentication error";
+                            break;
+                        case USE_DATABASE_ERROR:
+                            StatusMessage = "Error using database";
+                            break;
+                        case QUERY_ERROR:
+                            StatusMessage = "Error executing query";
+                            break;
+                        case DESCRIBE_ERROR:
+                            StatusMessage = "Error describing tables";
+                            break;
+                        case NO_TABLES_ERROR:
+                            StatusMessage = "No tables found";
+                            break;
+                        case EXCEPTION_DESCRIBING_TABLES:
+                            StatusMessage = "Exception while describing tables";
+                            break;
+                        case ODBC_ERROR:
+                            StatusMessage = "ODBC error";
+                            break;
+                        case UNKNOWN_RESULT:
+                        default:
+                            StatusMessage = "Unknown error encountered";
+                            break;
+                    }
+                } );
             }
         }
     }
